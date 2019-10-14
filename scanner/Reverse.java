@@ -30,10 +30,6 @@ public class Reverse {
         }
         PrintWriter printWriter = new PrintWriter(System.out);
         for (int i = index - 1; i >= 0; i--){
-            /*
-            if (ints[i].length != 100)
-            System.out.println(i);
-            */
             for (int j = ints[i].length - 1; j >=0; j--){
                 printWriter.print(ints[i][j] + " ");
             }

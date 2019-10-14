@@ -1,9 +1,10 @@
 import java.util.Arrays;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Comparator;
 
 public class ReverseSort {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException{
         Scanner linesScanner = new Scanner(System.in);
         int[][] ints = new int[1][];
         long[] sums = new long[1];

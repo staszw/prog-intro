@@ -4,7 +4,7 @@ import java.util.Arrays;
 public class Scanner implements AutoCloseable {
     private char[] buffer;
     private Reader reader;
-    private final int sz = 88888;
+    private final int sz = 128;
     private int head;
     private boolean isEndOfInputReached;
 
@@ -32,19 +32,12 @@ public class Scanner implements AutoCloseable {
         Arrays.fill(buffer, sz, sz * 2, (char) 0);
     }
 
-    private boolean readBuffer() {
+    private boolean readBuffer() throws IOException {
         if (isEndOfInputReached) {
             return false;
         }
         shiftBuffer();
-        int flag;
-        try {
-            flag = reader.read(buffer, sz, sz);
-        } catch (IOException e) {
-            System.out.println("IOException while trying to read buffer" + e.getMessage());
-            System.exit(0);
-            return false;
-        }
+        int flag = reader.read(buffer, sz, sz);
         if (flag != -1) {
             head = 0;
             if (buffer[head] == 0) {
@@ -60,16 +53,16 @@ public class Scanner implements AutoCloseable {
         return false;
     }
 
-    public boolean hasNext() {
+    public boolean hasNext() throws IOException {
         return (head < sz && buffer[head] != 0)
                 || readBuffer();
     }
 
-    public boolean hasNextLine() {
+    public boolean hasNextLine() throws IOException {
         return hasNext();
     }
 
-    public boolean hasNextToken(IsToken isToken) {
+    public boolean hasNextToken(IsToken isToken) throws IOException {
         while (hasNext() && !isToken.isToken(charFromFirst(0))) {
             nextChar();
         }
@@ -79,35 +72,38 @@ public class Scanner implements AutoCloseable {
         return isToken.isToken(charFromFirst(0));
     }
 
-    public boolean hasNextInt() {
+    public boolean hasNextInt() throws IOException {
         return hasNextToken(new IsInt());
     }
 
-    public boolean hasNextWord() {
+    public boolean hasNextWord() throws IOException {
         return hasNextToken(new IsWord());
     }
 
-    public char charFromFirst(int delta) {
-        if (!hasNext()) {
-            return (char) -1;
-        }
+    private char charFromFirst(int delta) {
         return buffer[head + delta];
     }
 
-    public char nextChar() {
+    public char nextChar() throws IOException {
+        if (!hasNext()) {
+            throw new IOException("Tried to read character, not found any");
+        }
         char result = charFromFirst(0);
         head++;
         return result;
     }
 
-    public String nextToken(IsToken comp) {
+    public String nextToken(IsToken isToken) throws IOException {
+        if (!hasNextToken(isToken)){
+            throw new IOException("Tried to get next token, but not found any tokens of this type");
+        }
         StringBuilder result = new StringBuilder();
         char curChar = charFromFirst(0);
-        while (hasNext() && !comp.isToken(curChar)) {
+        while (hasNext() && !isToken.isToken(curChar)) {
             nextChar();
             curChar = charFromFirst(0);
         }
-        while (comp.isToken(curChar)) {
+        while (isToken.isToken(curChar)) {
             result.append(curChar);
             nextChar();
             if (hasNext()) {
@@ -119,15 +115,15 @@ public class Scanner implements AutoCloseable {
         return result.toString();
     }
 
-    public int nextInt() {
+    public int nextInt() throws IOException {
         return Integer.parseInt(nextToken(new IsInt()));
     }
 
-    public String nextWord() {
+    public String nextWord() throws IOException {
         return nextToken(new IsWord());
     }
 
-    private boolean isLineSeparator() {
+    private boolean isLineSeparator() throws IOException {
         int len = System.lineSeparator().length();
         for (int i = 0; i < len; i++) {
             if (charFromFirst(i) != System.lineSeparator().charAt(i)) {
@@ -137,7 +133,7 @@ public class Scanner implements AutoCloseable {
         return true;
     }
 
-    public String nextLine() {
+    public String nextLine() throws IOException {
         StringBuilder result = new StringBuilder();
         while (hasNext()) {
             if (isLineSeparator()) {
