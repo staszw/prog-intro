@@ -9,20 +9,24 @@ public class ReverseSort {
         int[][] ints = new int[1][];
         long[] sums = new long[1];
         int index = 0;
-        try (Scanner linesScanner = new Scanner(System.in)) {
+        try (Scanner linesScanner = new Scanner(System.in, "UTF-8")) {
             while (linesScanner.hasNextLine()) {
                 int[] row = new int[1];
                 String line = linesScanner.nextLine();
-                Scanner intsScanner = new Scanner(line);
                 int currentIndex = 0;
                 long currentSum = 0;
-                while (intsScanner.hasNextInt()) {
-                    int current = intsScanner.nextInt();
-                    if (currentIndex >= row.length) {
-                        row = Arrays.copyOf(row, row.length * 2);
+                try (Scanner intsScanner = new Scanner(line)) {
+                    while (intsScanner.hasNextInt()) {
+                        int current = intsScanner.nextInt();
+                        if (currentIndex >= row.length) {
+                            row = Arrays.copyOf(row, row.length * 2);
+                        }
+                        currentSum += current;
+                        row[currentIndex++] = current;
                     }
-                    currentSum += current;
-                    row[currentIndex++] = current;
+                } catch (IOException e){
+                    System.out.println("Error trying to parse line" + e.getMessage());
+                    return;
                 }
                 if (index >= ints.length) {
                     ints = Arrays.copyOf(ints, ints.length * 2);
@@ -39,21 +43,17 @@ public class ReverseSort {
             return;
         }
 
-        final long[] fsums = sums;
-        Integer[] indexs = new Integer[index];
+        final long[] finalSums = sums;
+        Integer[] indexes = new Integer[index];
         for (int i = 0; i < index; i++) {
-            indexs[i] = i;
+            indexes[i] = i;
         }
-        Arrays.sort(indexs, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer a, Integer b) {
-                return Long.compare(fsums[a], fsums[b]);
-            }
-        });
+        Arrays.sort(indexes, Comparator.comparingLong(a -> finalSums[a]));
+
 
         PrintWriter output = new PrintWriter(System.out);
         for (int sortedIndex = index - 1; sortedIndex >= 0; sortedIndex--) {
-            int i = indexs[sortedIndex];
+            int i = indexes[sortedIndex];
             for (int j = ints[i].length - 1; j >= 0; j--) {
                 output.print(ints[i][j] + " ");
             }

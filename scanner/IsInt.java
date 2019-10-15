@@ -1,7 +1,8 @@
 public class IsInt implements IsToken{
+    public static final IsToken INSTANCE = new IsInt();
 
     @Override
     public boolean isToken(char x) {
-        return Character.isDigit(x) || x == '-';
+        return x != ' ';
     }
 }

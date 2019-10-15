@@ -1,116 +1,71 @@
 import java.io.*;
-import java.util.Arrays;
 
 public class Scanner implements AutoCloseable {
-    private char[] buffer;
     private Reader reader;
-    private final int sz = 128;
-    private int head;
-    private boolean isEndOfInputReached;
+    private int last;
 
-    public Scanner(Reader r) {
-        buffer = new char[sz * 2];
-        head = 0;
+    public Scanner(Reader r) throws IOException {
         reader = r;
-        isEndOfInputReached = false;
+        last = reader.read();
     }
 
-    public Scanner(File f, String cs) throws FileNotFoundException, UnsupportedEncodingException {
+    public Scanner(File f, String cs) throws IOException {
         this(new InputStreamReader(new FileInputStream(f), cs));
     }
 
-    public Scanner(InputStream f) {
-        this(new InputStreamReader(f));
+    public Scanner(InputStream f, String cs) throws IOException {
+        this(new InputStreamReader(f, cs));
     }
 
-    public Scanner(String s) {
+    public Scanner(String s) throws IOException {
         this(new StringReader(s));
     }
 
-    private void shiftBuffer() {
-        System.arraycopy(buffer, sz, buffer, 0, sz);
-        Arrays.fill(buffer, sz, sz * 2, (char) 0);
+    public boolean hasNext() {
+        return last != -1;
     }
 
-    private boolean readBuffer() throws IOException {
-        if (isEndOfInputReached) {
-            return false;
-        }
-        shiftBuffer();
-        int flag = reader.read(buffer, sz, sz);
-        if (flag != -1) {
-            head = 0;
-            if (buffer[head] == 0) {
-                readBuffer();
-            }
-            return true;
-        }
-        isEndOfInputReached = true;
-        if (buffer[0] != 0) {
-            head = 0;
-            return true;
-        }
-        return false;
+    private char lastChar() {
+        return (char) last;
     }
 
-    public boolean hasNext() throws IOException {
-        return (head < sz && buffer[head] != 0)
-                || readBuffer();
-    }
-
-    public boolean hasNextLine() throws IOException {
+    public boolean hasNextLine() {
         return hasNext();
     }
 
     public boolean hasNextToken(IsToken isToken) throws IOException {
-        while (hasNext() && !isToken.isToken(charFromFirst(0))) {
+        while (hasNext() && !isToken.isToken(lastChar())) {
             nextChar();
         }
         if (!hasNext()) {
             return false;
         }
-        return isToken.isToken(charFromFirst(0));
+        return isToken.isToken(lastChar());
     }
 
     public boolean hasNextInt() throws IOException {
-        return hasNextToken(new IsInt());
+        return hasNextToken(IsInt.INSTANCE);
     }
 
     public boolean hasNextWord() throws IOException {
-        return hasNextToken(new IsWord());
+        return hasNextToken(IsWord.INSTANCE);
     }
 
-    private char charFromFirst(int delta) {
-        return buffer[head + delta];
-    }
-
-    public char nextChar() throws IOException {
-        if (!hasNext()) {
-            throw new IOException("Tried to read character, not found any");
-        }
-        char result = charFromFirst(0);
-        head++;
-        return result;
+    public void nextChar() throws IOException {
+        last = reader.read();
     }
 
     public String nextToken(IsToken isToken) throws IOException {
-        if (!hasNextToken(isToken)){
-            throw new IOException("Tried to get next token, but not found any tokens of this type");
+        if (!hasNextToken(isToken)) {
+            throw new EOFException("Tried to get next token, but not found any tokens of this type");
         }
         StringBuilder result = new StringBuilder();
-        char curChar = charFromFirst(0);
-        while (hasNext() && !isToken.isToken(curChar)) {
+        while (hasNext() && !isToken.isToken(lastChar())) {
             nextChar();
-            curChar = charFromFirst(0);
         }
-        while (isToken.isToken(curChar)) {
-            result.append(curChar);
+        while (hasNext() && isToken.isToken(lastChar())) {
+            result.append(lastChar());
             nextChar();
-            if (hasNext()) {
-                curChar = charFromFirst(0);
-            } else {
-                break;
-            }
         }
         return result.toString();
     }
@@ -123,26 +78,25 @@ public class Scanner implements AutoCloseable {
         return nextToken(new IsWord());
     }
 
-    private boolean isLineSeparator() throws IOException {
-        int len = System.lineSeparator().length();
-        for (int i = 0; i < len; i++) {
-            if (charFromFirst(i) != System.lineSeparator().charAt(i)) {
-                return false;
-            }
+    private boolean isLineSeparator() {
+        return last == '\n' || last == '\r';
+    }
+
+    private void passLineSeparator() throws IOException {
+        for (int i = 0; i < System.lineSeparator().length(); i++) {
+            nextChar();
         }
-        return true;
     }
 
     public String nextLine() throws IOException {
         StringBuilder result = new StringBuilder();
         while (hasNext()) {
             if (isLineSeparator()) {
-                for (int i = 0; i < System.lineSeparator().length(); i++) {
-                    nextChar();
-                }
+                passLineSeparator();
                 return result.toString();
             }
-            result.append(nextChar());
+            result.append(lastChar());
+            nextChar();
         }
         return result.toString();
     }

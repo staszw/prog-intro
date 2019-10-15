@@ -1,4 +1,6 @@
 public class IsWord implements IsToken {
+    public static final IsToken INSTANCE = new IsWord();
+
     @Override
     public boolean isToken(char x) {
         if (Character.getType(x) == Character.LOWERCASE_LETTER)
