@@ -22,20 +22,20 @@ public class IntList {
         return this;
     }
 
+    int get(int x){
+        if (x >= size){
+            return -1;
+        }
+        return list[x];
+    }
+
+    int length(){
+        return size;
+    }
+
     IntList merge(IntList other) {
         for (int i = 0; i < other.size; i++)
             add(other.list[i]);
         return this;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append(size).append(" ");
-        for (int i = 0; i < size; i++) {
-            result.append(list[i]);
-            if (i + 1 != size) result.append(" ");
-        }
-        return result.toString();
     }
 }
