@@ -1,4 +1,6 @@
-public class IsWord implements IsToken {
+package scanner;
+
+class IsWord implements IsToken {
     public static final IsToken INSTANCE = new IsWord();
 
     @Override

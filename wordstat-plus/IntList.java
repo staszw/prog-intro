@@ -22,20 +22,12 @@ public class IntList {
         return this;
     }
 
-    int get(int x){
-        if (x >= size){
-            return -1;
-        }
-        return list[x];
-    }
-
-    int length(){
+    int getSize(){
         return size;
     }
 
-    IntList merge(IntList other) {
-        for (int i = 0; i < other.size; i++)
-            add(other.list[i]);
-        return this;
+    int intAt(int index){
+        return list[index];
     }
+
 }

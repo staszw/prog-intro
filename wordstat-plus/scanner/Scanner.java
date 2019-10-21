@@ -1,3 +1,5 @@
+package scanner;
+
 import java.io.*;
 
 public class Scanner implements AutoCloseable {

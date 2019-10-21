@@ -1,24 +1,28 @@
-import java.util.Arrays;
-
 public class FirstIntList {
-    public IntList lines;
-    public IntList nums;
+    private int last_line;
+    private IntList nums;
+    private int count;
 
-    IntList() {
-        lines = new IntList();
+    FirstIntList() {
+        last_line = -1;
         nums = new IntList();
-        size = 0;
+        count = 0;
     }
 
-    FirstIntList add(int x, int y) {
-        lines.add(x);
-        lines.add(y);
+    FirstIntList add(int new_line, int new_num) {
+        if (new_line != last_line){
+            nums.add(new_num);
+            last_line = new_line;
+        }
+        count++;
         return this;
     }
 
-    FirstIntList merge(FirstIntList other) {
-        for (int i = 0; i < other.size; i++)
-            add(other.lines.get(i), other.nums.get(i));
-        return this;
+    int getCount(){
+        return count;
+    }
+
+    IntList getNums(){
+        return nums;
     }
 }

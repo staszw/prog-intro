@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import scanner.Scanner;
 
 public class WordStatFirstIndex {
     public static void main(String[] args) {
@@ -19,7 +20,7 @@ public class WordStatFirstIndex {
                     while (wordScanner.hasNextWord()) {
                         numCounter++;
                         String currentWord = wordScanner.nextWord();
-                        map.merge(currentWord, new FirstIntList().add(lineCounter, numCounter), FirstIntList::merge);
+                        map.computeIfAbsent(currentWord, k -> new FirstIntList()).add(lineCounter, numCounter);
                     }
                 } catch (IOException e) {
                     System.out.println("Error parsing line" + e.getMessage());
@@ -39,11 +40,19 @@ public class WordStatFirstIndex {
 
         try (BufferedWriter output = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(args[1]), "UTF-8"))) {
-            for (Map.Entry current : map.entrySet()) {
-                output.write(current.getKey() + " ");
-                FirstIntList intList = current.getValue();
-                
-                output.write('\n');
+            for (Map.Entry<String, FirstIntList> current : map.entrySet()) {
+                StringBuilder result = new StringBuilder();
+                result.append(current.getKey()).append(" ");
+                result.append(current.getValue().getCount()).append(" ");
+                IntList nums = current.getValue().getNums();
+                int length = nums.getSize();
+                for (int i = 0; i < length; i++){
+                    result.append(nums.intAt(i));
+                    if (i + 1 < length)
+                        result.append(" ");
+                }
+                output.write(result.toString());
+                output.newLine();
             }
         } catch (FileNotFoundException e) {
             System.out.println("Output File doesn't exist or we can't write to it " + e.getMessage());

@@ -1,4 +1,6 @@
-public class IsInt implements IsToken{
+package scanner;
+
+class IsInt implements IsToken{
     public static final IsToken INSTANCE = new IsInt();
 
     @Override
