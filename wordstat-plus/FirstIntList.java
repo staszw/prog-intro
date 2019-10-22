@@ -3,14 +3,14 @@ public class FirstIntList {
     private IntList nums;
     private int count;
 
-    FirstIntList() {
+    public FirstIntList() {
         last_line = -1;
         nums = new IntList();
         count = 0;
     }
 
-    FirstIntList add(int new_line, int new_num) {
-        if (new_line != last_line){
+    public FirstIntList add(int new_line, int new_num) {
+        if (new_line != last_line) {
             nums.add(new_num);
             last_line = new_line;
         }
@@ -18,11 +18,11 @@ public class FirstIntList {
         return this;
     }
 
-    int getCount(){
+    public int getCount() {
         return count;
     }
 
-    IntList getNums(){
+    public IntList getNums() {
         return nums;
     }
 }

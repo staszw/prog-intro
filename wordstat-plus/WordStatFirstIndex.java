@@ -16,15 +16,11 @@ public class WordStatFirstIndex {
                 lineCounter++;
                 int numCounter = 0;
                 String line = input.nextLine().toLowerCase();
-                try (Scanner wordScanner = new Scanner(line)) {
-                    while (wordScanner.hasNextWord()) {
-                        numCounter++;
-                        String currentWord = wordScanner.nextWord();
-                        map.computeIfAbsent(currentWord, k -> new FirstIntList()).add(lineCounter, numCounter);
-                    }
-                } catch (IOException e) {
-                    System.out.println("Error parsing line" + e.getMessage());
-                    return;
+                Scanner wordScanner = new Scanner(line);
+                while (wordScanner.hasNextWord()) {
+                    numCounter++;
+                    String currentWord = wordScanner.nextWord();
+                    map.computeIfAbsent(currentWord, k -> new FirstIntList()).add(lineCounter, numCounter);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -41,15 +37,16 @@ public class WordStatFirstIndex {
         try (BufferedWriter output = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(args[1]), "UTF-8"))) {
             for (Map.Entry<String, FirstIntList> current : map.entrySet()) {
-                StringBuilder result = new StringBuilder();
-                result.append(current.getKey()).append(" ");
-                result.append(current.getValue().getCount()).append(" ");
+                StringBuilder result = new StringBuilder()
+                    .append(current.getKey()).append(" ")
+                    .append(current.getValue().getCount()).append(" ");
                 IntList nums = current.getValue().getNums();
                 int length = nums.getSize();
-                for (int i = 0; i < length; i++){
+                for (int i = 0; i < length; i++) {
                     result.append(nums.intAt(i));
-                    if (i + 1 < length)
+                    if (i + 1 < length) {
                         result.append(" ");
+                    }
                 }
                 output.write(result.toString());
                 output.newLine();

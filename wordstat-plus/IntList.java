@@ -4,7 +4,7 @@ public class IntList {
     private int[] list;
     private int size;
 
-    IntList() {
+    public IntList() {
         list = new int[1];
         size = 0;
     }
@@ -15,18 +15,18 @@ public class IntList {
         }
     }
 
-    IntList add(int x) {
+    public IntList add(int x) {
         resize();
         list[size] = x;
         size++;
         return this;
     }
 
-    int getSize(){
+    public int getSize(){
         return size;
     }
 
-    int intAt(int index){
+    public int intAt(int index){
         return list[index];
     }
 
