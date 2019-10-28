@@ -2,15 +2,18 @@ package markup;
 
 import java.util.List;
 
-public class Strikeout extends Paragraph {
-    public Strikeout(List<Markable> list) {
+public class Strikeout extends AbstractContainer implements PartOfHighlight {
+    public Strikeout(List<PartOfHighlight> list) {
         super(list);
     }
 
     @Override
     public void toMarkdown(StringBuilder sb) {
-        sb.append("~");
-        super.toMarkdown(sb);
-        sb.append("~");
+        super.toMarkdown(sb, "~", "~");
+    }
+
+    @Override
+    public void toHtml(StringBuilder sb) {
+        super.toHtml(sb, "<s>", "</s>");
     }
 }

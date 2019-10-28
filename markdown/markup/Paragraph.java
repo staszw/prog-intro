@@ -2,17 +2,16 @@ package markup;
 
 import java.util.List;
 
-public class Paragraph implements Markable {
-    private List<Markable> list;
-
-    public Paragraph(List<Markable> list) {
-        this.list = list;
+public class Paragraph extends AbstractContainer implements PartOfItem {
+    public Paragraph(List<PartOfHighlight> list) {
+        super(list);
     }
 
-    @Override
     public void toMarkdown(StringBuilder sb) {
-        for (Markable current : list) {
-            current.toMarkdown(sb);
-        }
+        super.toMarkdown(sb, "", "");
+    }
+
+    public void toHtml(StringBuilder sb) {
+        super.toHtml(sb, "", "");
     }
 }
