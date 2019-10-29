@@ -13,8 +13,7 @@ public class OrderedList extends AbstractContainer implements PartOfItem {
     }
 
     @Override
-    @Deprecated
-    public void toMarkdown(StringBuilder sb) {
-        //List doesn't support markdown
+    public void toMarkdown(StringBuilder sb) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("OrderedList doesn't support markdown");
     }
 }

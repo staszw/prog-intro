@@ -14,7 +14,7 @@ public class ListItem extends AbstractContainer {
 
     @Override
     @Deprecated
-    public void toMarkdown(StringBuilder sb) {
-        // ListItem doesn't support markdown
+    public void toMarkdown(StringBuilder sb) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("ListItem doesn't support markdown");
     }
 }

@@ -10,21 +10,17 @@ public abstract class AbstractContainer implements Element {
     }
 
     public void toHtml(StringBuilder sb, String leftMargin, String rightMargin) {
-        fillStringBuilder(sb, leftMargin, rightMargin, "html");
+        sb.append(leftMargin);
+        for (Element current : list) {
+            current.toHtml(sb);
+        }
+        sb.append(rightMargin);
     }
 
     public void toMarkdown(StringBuilder sb, String leftMargin, String rightMargin) {
-        fillStringBuilder(sb, leftMargin, rightMargin, "markdown");
-    }
-
-    private void fillStringBuilder(StringBuilder sb, String leftMargin, String rightMargin, String type){
         sb.append(leftMargin);
         for (Element current : list) {
-            if (type.equals("markdown")){
-                current.toMarkdown(sb);
-            } else {
-                current.toHtml(sb);
-            }
+            current.toMarkdown(sb);
         }
         sb.append(rightMargin);
     }

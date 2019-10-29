@@ -14,6 +14,6 @@ public class Strikeout extends AbstractContainer implements PartOfHighlight {
 
     @Override
     public void toHtml(StringBuilder sb) {
-        super.toHtml(sb, "<s>", "</s>");
+        toHtml(sb, "<s>", "</s>");
     }
 }
