@@ -8,12 +8,8 @@ public class Text implements PartOfHighlight {
     }
 
     @Override
-    public void toMarkdown(StringBuilder sb) {
+    public StringBuilder toHtml(StringBuilder sb) {
         sb.append(text);
-    }
-
-    @Override
-    public void toHtml(StringBuilder sb) {
-        sb.append(text);
+        return sb;
     }
 }

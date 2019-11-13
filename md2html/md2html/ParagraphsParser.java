@@ -5,7 +5,13 @@ import markup.*;
 import java.util.List;
 
 public class ParagraphsParser {
-    private static int getLevel(String text){
+    private String text;
+
+    public ParagraphsParser(String text){
+        this.text = text;
+    }
+
+    private int getLevel(){
         int level = 0;
         while (text.length() > level && text.charAt(level) == '#') {
             level++;
@@ -16,12 +22,13 @@ public class ParagraphsParser {
         return level;
     }
 
-    public static ExternalClass parse(String text) {
-        int level = getLevel(text);
+    public ExternalClass parse() {
+        int level = getLevel();
         if (level != 0)
             text = text.substring(level + 1);
 
-        List<PartOfHighlight> list = HighlightsParser.parse(text);
+        HighlightsParser parser = new HighlightsParser(text);
+        List<PartOfHighlight> list = parser.parse();
 
         if (level == 0) {
             return new Paragraph(list);

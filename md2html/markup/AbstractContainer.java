@@ -3,25 +3,22 @@ package markup;
 import java.util.List;
 
 public abstract class AbstractContainer implements Element {
-    private final List<? extends Element> list;
+    protected List<PartOfHighlight> list;
 
-    public AbstractContainer(List<? extends Element> list) {
+    public AbstractContainer(List<PartOfHighlight> list) {
         this.list = list;
     }
 
-    public void toHtml(StringBuilder sb, String leftMargin, String rightMargin) {
+    public StringBuilder toHtml(StringBuilder sb, String leftMargin, String rightMargin) {
         sb.append(leftMargin);
         for (Element current : list) {
             current.toHtml(sb);
         }
         sb.append(rightMargin);
+        return sb;
     }
 
-    public void toMarkdown(StringBuilder sb, String leftMargin, String rightMargin) {
-        sb.append(leftMargin);
-        for (Element current : list) {
-            current.toMarkdown(sb);
-        }
-        sb.append(rightMargin);
+    public void add(PartOfHighlight newElement){
+        list.add(newElement);
     }
 }

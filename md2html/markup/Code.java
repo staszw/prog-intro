@@ -2,18 +2,13 @@ package markup;
 
 import java.util.List;
 
-public class Code extends AbstractContainer implements PartOfHighlight {
+public class Code extends ContainerOfHighlight {
     public Code(List<PartOfHighlight> list) {
         super(list);
     }
-
     @Override
-    public void toMarkdown(StringBuilder sb) {
-        super.toMarkdown(sb, "\'", "\'");
-    }
-
-    @Override
-    public void toHtml(StringBuilder sb) {
+    public StringBuilder toHtml(StringBuilder sb) {
         super.toHtml(sb, "<code>", "</code>");
+        return sb;
     }
 }
