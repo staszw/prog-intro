@@ -5,190 +5,137 @@ import markup.*;
 import java.util.*;
 
 public class HighlightsParser {
-    private static final Set<Character> SPECIAL_SYMBOLS;
-    private static final Map<String, String> PAIR_OF_TAG;
-    private static final Map<Character, String> SPECIAL_IN_HTML;
-    private static final Set<String> TAGS;
+    private static final Set<Character> SPECIAL_SYMBOLS = Set.of('*', '-', '_', '`', '[', ']');
+    private static final Map<String, String> PAIR_OF_TAG = Map.of(
+            "*", "*",
+            "_", "_",
+            "**", "**",
+            "__", "__",
+            "--", "--",
+            "`", "`",
+            "[", "]"
+    );
+    private static final Map<Character, String> SPECIAL_IN_HTML = Map.of(
+            '<', "&lt;",
+            '>', "&gt;",
+            '&', "&amp;"
+    );
+    private static final Set<String> TAGS = Set.of("*", "_", "**", "__", "--", "`", "[", "]");
 
-    static {
-        SPECIAL_SYMBOLS = Set.of('*', '-', '_', '`', '[', ']');
-        PAIR_OF_TAG = Map.of(
-                "*", "*",
-                "_", "_",
-                "**", "**",
-                "__", "__",
-                "--", "--",
-                "`", "`",
-                "[", "]"
-        );
-        SPECIAL_IN_HTML = Map.of('<', "&lt;", '>', "&gt;", '&', "&amp;");
-        TAGS = Set.of("*", "_", "**", "__", "--", "`", "[", "]");
-    }
 
-    private List<PartOfHighlight> result;
+    private final List<PartOfHighlight> result;
     private StringBuilder currentText;
-    private Stack<String> stack;
-    private Stack<ContainerOfHighlight> highlightStack;
+    private final Deque<String> stack;
+    private final Stack<ContainerOfHighlight> highlightStack;
 
-    private String text;
+    private final String text;
 
-    public HighlightsParser(String text){
-        this.text = text + "\0";
+    public HighlightsParser(final String text) {
+        this.text = text + "\n";
         result = new ArrayList<>();
         currentText = new StringBuilder();
-        stack = new Stack<>();
+        stack = new ArrayDeque<>();
         highlightStack = new Stack<>();
         stack.push(null);
     }
 
-    private boolean checkIfSingle(int i, int len) {
-        if (i > 0 && !Character.isWhitespace(text.charAt(i - 1))) {
+    private boolean checkIfSingle(int position, int len) {
+        if (position > 0 && !Character.isWhitespace(text.charAt(position - 1))) {
             return false;
         }
         if (len == 1) {
-            return Character.isWhitespace(text.charAt(i + 1));
+            return Character.isWhitespace(text.charAt(position + 1));
         }
-        return i + 2 >= text.length() || Character.isWhitespace(text.charAt(i + 2));
+        return position + 2 >= text.length() || Character.isWhitespace(text.charAt(position + 2));
     }
 
-    private boolean checkIfShielded(int i) {
-        return text.charAt(i) == '\\' && SPECIAL_SYMBOLS.contains(text.charAt(i + 1));
-    }
-
-    private boolean checkIfSpecialInHtml(int i) {
-        return SPECIAL_IN_HTML.containsKey(text.charAt(i));
-    }
-
-    private boolean checkIfRegularSymbol(int i) {
-        return !SPECIAL_SYMBOLS.contains(text.charAt(i));
-    }
-
-    private String getCurrentTag(int i) {
-        String currentTag = String.valueOf(text.charAt(i));
-        if (TAGS.contains(currentTag + text.charAt(i + 1))) {
-            currentTag += text.charAt(i + 1);
+    private String getCurrentTag(int position) {
+        String currentTag = String.valueOf(text.charAt(position));
+        if (TAGS.contains(currentTag + text.charAt(position + 1))) {
+            return currentTag + text.charAt(position + 1);
         }
 
-        if (!TAGS.contains(currentTag)) {
-            return null;
-        }
-        return currentTag;
+        return TAGS.contains(currentTag) ? currentTag : null;
     }
 
-    private void addToText(String newElement) {
-        currentText.append(newElement);
-    }
-
-    private void addToText(char newElement) {
-        currentText.append(newElement);
-    }
-
-    private Text getText(){
-        Text result = new Text(currentText.toString());
-        currentText = new StringBuilder();
-        return result;
-    }
-
-    private void flushText(){
+    private void flushText() {
         if (currentText.length() != 0) {
             if (highlightStack.size() == 0) {
-                result.add(getText());
+                result.add(new Text(currentText.toString()));
             } else {
-                highlightStack.lastElement().add(getText());
+                highlightStack.lastElement().add(new Text(currentText.toString()));
             }
         }
+        currentText = new StringBuilder();
     }
 
-    private String getAddress(int i){
-        i += 2;
-        StringBuilder address = new StringBuilder();
-        while (text.charAt(i) != ')') {
-            address.append(text.charAt(i));
-            i++;
-        }
-        return address.toString();
-    }
-
-    private ContainerOfHighlight newContainer(String tag){
-        List<PartOfHighlight> insideToken = new ArrayList<>();
+    private ContainerOfHighlight newContainer(String tag) {
         switch (tag) {
             case "*":
             case "_":
-                return new Emphasis(insideToken);
+                return new Emphasis(new ArrayList<>());
             case "**":
             case "__":
-                return new Strong(insideToken);
+                return new Strong(new ArrayList<>());
             case "`":
-                return new Code(insideToken);
+                return new Code(new ArrayList<>());
             case "--":
-                return new Strikeout(insideToken);
+                return new Strikeout(new ArrayList<>());
             case "[":
-                return new Link(insideToken);
+                return new Link(new ArrayList<>());
             default:
                 return null;
         }
     }
 
-    private boolean checkIfPairOfTags(String tagA, String tagB){
-        return tagA != null && tagB.equals(PAIR_OF_TAG.get(tagA));
-    }
-
-    private void addToPrevious(ContainerOfHighlight container){
-        if (highlightStack.size() == 0) {
-            result.add(container);
-        } else {
-            highlightStack.lastElement().add(container);
-        }
-    }
-
     public List<PartOfHighlight> parse() {
-        for (int i = 0; i < text.length() - 1; i++) {
-            char currentSymbol = text.charAt(i);
-            char nextSymbol = text.charAt(i + 1);
+        for (int position = 0; position < text.length() - 1; position++) {
+            char currentSymbol = text.charAt(position);
+            char nextSymbol = text.charAt(position + 1);
 
-            if (checkIfShielded(i)) {
-                addToText(nextSymbol);
-                i++;
-                continue;
-            }
-            if (checkIfSpecialInHtml(i)) {
-                addToText(SPECIAL_IN_HTML.get(currentSymbol));
-                continue;
-            }
-            if (checkIfRegularSymbol(i)) {
-                addToText(currentSymbol);
-                continue;
-            }
-
-            String currentTag = getCurrentTag(i);
-            if (currentTag == null) {
-                addToText(currentSymbol);
-                continue;
-            }
-            if (checkIfSingle(i, currentTag.length())) {
-                addToText(currentTag);
-                i += currentTag.length() - 1;
-                continue;
-            }
-
-            flushText();
-
-            // check if there is an end of last tag
-            if (checkIfPairOfTags(stack.lastElement(), currentTag)) {
-                ContainerOfHighlight last = highlightStack.pop();
-                stack.pop();
-                if (currentTag.equals("]")) {
-                    String address = getAddress(i);
-                    ((Link) last).setAddress(address);
-                    i += address.length() + 2;
-                }
-                addToPrevious(last);
+            if (currentSymbol == '\\' && SPECIAL_SYMBOLS.contains(nextSymbol)) {
+                currentText.append(nextSymbol);
+                position++;
+            } else if (SPECIAL_IN_HTML.containsKey(currentSymbol)) {
+                currentText.append(SPECIAL_IN_HTML.get(currentSymbol));
+            } else if (!SPECIAL_SYMBOLS.contains(currentSymbol)) {
+                currentText.append(currentSymbol);
             } else {
-                //now current tag is the new tag in stack
-                highlightStack.push(newContainer(currentTag));
-                stack.push(currentTag);
+
+                String currentTag = getCurrentTag(position);
+                if (currentTag == null) {
+                    currentText.append(currentSymbol);
+                } else if (checkIfSingle(position, currentTag.length())) {
+                    currentText.append(currentTag);
+                    position += currentTag.length() - 1;
+                } else {
+                    flushText();
+                    // check if there is an end of last tag
+                    if (stack.getLast() != null && currentTag.equals(PAIR_OF_TAG.get(stack.getLast()))) {
+                        ContainerOfHighlight last = highlightStack.pop();
+                        stack.pop();
+                        if (currentTag.equals("]")) {
+                            position += 2;
+                            StringBuilder address = new StringBuilder();
+                            while (text.charAt(position) != ')') {
+                                address.append(text.charAt(position));
+                                position++;
+                            }
+                            ((Link) last).setAddress(address.toString());
+                        }
+                        if (highlightStack.size() == 0) {
+                            result.add(last);
+                        } else {
+                            highlightStack.lastElement().add(last);
+                        }
+                    } else {
+                        //now current tag is the new tag in stack
+                        highlightStack.push(newContainer(currentTag));
+                        stack.push(currentTag);
+                    }
+                    position += (currentTag.length() - 1);
+                }
             }
-            i += (currentTag.length() - 1);
         }
         flushText();
         return result;

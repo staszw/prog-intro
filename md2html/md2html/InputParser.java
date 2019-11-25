@@ -5,17 +5,17 @@ import java.io.IOException;
 import java.util.StringJoiner;
 
 public class InputParser {
-    private BufferedReader input;
+    private final BufferedReader input;
     private StringJoiner inputJoiner;
-    private StringBuilder outputBuilder;
+    private final StringBuilder outputBuilder;
 
-    public InputParser(BufferedReader input){
+    public InputParser(final BufferedReader input) {
         this.input = input;
         inputJoiner = new StringJoiner("\n");
         outputBuilder = new StringBuilder();
     }
 
-    private void processParagraph(){
+    private void processParagraph() {
         if (inputJoiner.length() != 0) {
             ParagraphsParser parser = new ParagraphsParser(inputJoiner.toString());
             parser.parse().toHtml(outputBuilder).append("\n");
@@ -28,14 +28,11 @@ public class InputParser {
         while ((current = input.readLine()) != null) {
             if (current.length() == 0) {
                 processParagraph();
-            }
-            else {
+            } else {
                 inputJoiner.add(current);
             }
         }
-        if (inputJoiner.length() != 0){
-            processParagraph();
-        }
+        processParagraph();
         return outputBuilder.toString();
     }
 }

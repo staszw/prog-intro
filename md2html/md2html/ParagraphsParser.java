@@ -7,28 +7,28 @@ import java.util.List;
 public class ParagraphsParser {
     private String text;
 
-    public ParagraphsParser(String text){
+    public ParagraphsParser(String text) {
         this.text = text;
     }
 
-    private int getLevel(){
+    private int getLevel() {
         int level = 0;
-        while (text.length() > level && text.charAt(level) == '#') {
+        while (level < text.length() && text.charAt(level) == '#') {
             level++;
         }
-        if (text.length() == level || text.charAt(level) != ' ') {
-            level = 0;
+        if (level < text.length() && text.charAt(level) == ' ') {
+            return level;
         }
-        return level;
+        return 0;
     }
 
     public ExternalClass parse() {
         int level = getLevel();
-        if (level != 0)
+        if (level != 0) {
             text = text.substring(level + 1);
+        }
 
-        HighlightsParser parser = new HighlightsParser(text);
-        List<PartOfHighlight> list = parser.parse();
+        List<PartOfHighlight> list = new HighlightsParser(text).parse();
 
         if (level == 0) {
             return new Paragraph(list);
