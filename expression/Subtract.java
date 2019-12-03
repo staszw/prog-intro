@@ -1,13 +1,27 @@
 package expression;
 
-public class Subtract extends Operation {
-    public Subtract(Expression left, Expression right) {
+public final class Subtract extends BinaryOperation {
+    public Subtract(MyExpression left, MyExpression right) {
         super(left, right);
-        symbol = "-";
     }
 
     @Override
-    public int evaluate(int x) {
-        return left.evaluate(x) - right.evaluate(x);
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public String getSymbol() {
+        return "-";
+    }
+
+    @Override
+    public int calculate(int x, int y) {
+        return x - y;
+    }
+
+    @Override
+    public boolean needsExtraBrackets() {
+        return true;
     }
 }

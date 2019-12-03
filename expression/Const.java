@@ -1,14 +1,10 @@
 package expression;
 
-public class Const implements Expression {
-    private int number;
-    public Const(int number){
-        this.number = number;
-    }
+public final class Const extends MyExpression {
+    private final int number;
 
-    @Override
-    public int evaluate(int x) {
-        return number;
+    public Const(int number) {
+        this.number = number;
     }
 
     @Override
@@ -24,5 +20,15 @@ public class Const implements Expression {
     @Override
     public int hashCode() {
         return Integer.hashCode(number);
+    }
+
+    @Override
+    public int evaluate(int x, int y, int z) {
+        return number;
+    }
+
+    @Override
+    public int evaluate(int x) {
+        return number;
     }
 }
