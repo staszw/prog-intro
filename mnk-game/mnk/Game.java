@@ -1,27 +1,27 @@
 package mnk;
 
-/**
- * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
- */
-public class Game {
+public final class Game {
     private final boolean log;
-    private final Player player1, player2;
+    private final Player[] players;
+    private final int numPlayers;
 
-    public Game(final boolean log, final Player player1, final Player player2) {
+    public Game(final boolean log, final Player... players) {
         this.log = log;
-        this.player1 = player1;
-        this.player2 = player2;
+        this.players = players;
+        this.numPlayers = players.length;
     }
 
-    public int play(Board board) {
+    public final int getNumPlayers() {
+        return numPlayers;
+    }
+
+    public final int play(Board board) {
         while (true) {
-            final int result1 = move(board, player1, 1);
-            if (result1 != -1) {
-                return result1;
-            }
-            final int result2 = move(board, player2, 2);
-            if (result2 != -1) {
-                return result2;
+            for (int index = 0; index < players.length; index++) {
+                final int result = move(board, players[index], index + 1);
+                if (result != -1) {
+                    return result;
+                }
             }
         }
     }
@@ -36,7 +36,7 @@ public class Game {
             return no;
         } else if (result == Result.LOSE) {
             log("Player " + no + " lose");
-            return 3 - no;
+            return -100500;
         } else if (result == Result.DRAW) {
             log("Draw");
             return 0;

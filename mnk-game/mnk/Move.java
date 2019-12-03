@@ -1,8 +1,5 @@
 package mnk;
 
-/**
- * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
- */
 public final class Move {
     private final int row;
     private final int column;
@@ -14,20 +11,20 @@ public final class Move {
         this.value = value;
     }
 
-    public int getRow() {
+    public final int getRow() {
         return row;
     }
 
-    public int getColumn() {
+    public final int getColumn() {
         return column;
     }
 
-    public Cell getValue() {
+    public final Cell getValue() {
         return value;
     }
 
     @Override
-    public String toString() {
-        return "row=" + row + ", column=" + column + ", value=" + value;
+    public final String toString() {
+        return "row = " + row + ", column = " + column + ", value = " + value;
     }
 }

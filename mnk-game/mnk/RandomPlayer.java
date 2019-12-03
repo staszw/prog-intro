@@ -2,9 +2,6 @@ package mnk;
 
 import java.util.Random;
 
-/**
- * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
- */
 public class RandomPlayer implements Player {
     private final Random random;
 

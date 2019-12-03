@@ -1,12 +1,9 @@
 package mnk;
 
 import java.io.PrintStream;
-import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-/**
- * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
- */
 public class HumanPlayer implements Player {
     private final PrintStream out;
     private final Scanner in;
@@ -27,21 +24,25 @@ public class HumanPlayer implements Player {
         out.println(cell + "'s move");
         int row, column;
         while (true) {
-            while (true) {
+            try {
                 out.println("Enter row and column");
-                try {
-                    row = in.nextInt();
-                    column = in.nextInt();
-                    break;
-                } catch (InputMismatchException e) {
-                    out.println("Input cannot be translated into a valid move");
-                }
+                row = nextInt();
+                column = nextInt();
+            } catch (NoSuchElementException e){
+                throw new IllegalStateException("Input has been closed");
             }
             final Move move = new Move(row, column, cell);
             if (position.isValid(move)) {
                 return move;
             }
-            out.println("Move " + move + " is invalid");
+            out.println("Move " + move + " is invalid. Try again");
         }
+    }
+
+    private int nextInt(){
+        while (!in.hasNextInt()) {
+            in.next();
+        }
+        return in.nextInt();
     }
 }

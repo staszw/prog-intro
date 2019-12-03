@@ -1,8 +1,8 @@
 package mnk;
 
-/**
- * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
- */
+import java.util.List;
+
 public enum Cell {
-    X, O, E
+    X, O, M, V, E;
+    public static final List<Cell> CELLS = List.of(X, O, M, V);
 }
