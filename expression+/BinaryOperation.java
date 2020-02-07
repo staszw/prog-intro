@@ -23,12 +23,18 @@ public abstract class BinaryOperation extends CommonExpression {
 
     @Override
     public int evaluate(int x, int y, int z) {
-        return calculate(left.evaluate(x, y, z), right.evaluate(x, y, z));
+        int leftValue = left.evaluate(x, y, z);
+        int rightValue = right.evaluate(x, y, z);
+        checkException(leftValue, rightValue);
+        return calculate(leftValue, rightValue);
     }
 
     @Override
     public int evaluate(int x) {
-        return calculate(left.evaluate(x), right.evaluate(x));
+        int leftValue = left.evaluate(x);
+        int rightValue = right.evaluate(x);
+        checkException(leftValue, rightValue);
+        return calculate(leftValue, rightValue);
     }
 
     @Override

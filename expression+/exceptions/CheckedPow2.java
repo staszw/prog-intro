@@ -1,28 +1,26 @@
 package expression.exceptions;
 
 import expression.CommonExpression;
+import expression.Const;
 import expression.UnaryOperation;
 
-public final class CheckedNegate extends UnaryOperation {
-
-    public CheckedNegate(CommonExpression inner) {
-        super(inner);
+public class CheckedPow2 extends UnaryOperation {
+    public CheckedPow2(CommonExpression inner) {
+        super(new CheckedPow(new Const(2), inner));
     }
 
     @Override
     public int calculate(int x) {
-        return -x;
+        return x;
     }
 
     @Override
     public void checkException(int x) {
-        if (x == Integer.MIN_VALUE) {
-            throw new OverflowException("Negate", "-" + x);
-        }
+        return;
     }
 
     @Override
     public String getSymbol() {
-        return "-";
+        return "pow2";
     }
 }

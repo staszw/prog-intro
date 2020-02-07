@@ -21,7 +21,6 @@ public final class CheckedMultiply extends BinaryOperation {
 
     @Override
     public int calculate(int x, int y) {
-        checkException(x, y);
         return x * y;
     }
 

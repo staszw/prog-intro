@@ -26,11 +26,26 @@ public class BaseParser {
         return false;
     }
 
+    protected boolean test(String expected) {
+        for (int i = 0; i < expected.length(); i++) {
+            if (!source.hasNext(i) || source.next(i) != expected.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected void expect(final char c) {
         if (ch != c) {
             throw new AssertException("Expected '" + c + "', found '" + ch + "'");
         }
         nextChar();
+    }
+
+    protected void expectSpace() {
+        if (!Character.isWhitespace(ch) && ch != '-' && ch != '(') {
+            throw new AssertException("Expected space after function");
+        }
     }
 
     protected void expect(final String value) {

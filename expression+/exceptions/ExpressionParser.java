@@ -3,60 +3,57 @@ package expression.exceptions;
 import expression.*;
 import expression.parser.*;
 
+import java.util.List;
 import java.util.Map;
 
 public class ExpressionParser extends BaseParser implements Parser {
     private static final int MAX_LEVEL = 1;
-    private static final int MIN_LEVEL = -1;
-    private String lastOperation = "";
-    private static final Map<String, Integer> PRIORITIES = Map.of(
-            "+", 1,
-            "-", 1,
-            "*", 0,
-            "/", 0,
-            ")", MAX_LEVEL + 1
+    private static final int MIN_LEVEL = -2;
+    private static final Map<Integer, List<String>> PRIORITIES = Map.of(
+            1, List.of("+", "-"),
+            0, List.of("*", "/"),
+            -1, List.of("**", "//")
     );
 
-    private static final Map<Character, String> GET_BY_FIRST_CHAR = Map.of(
-            '+', "+",
-            '-', "-",
-            '*', "*",
-            '/', "/",
-            ')', ")"
-    );
+    private static final List<Character> SPECIAL_SYMBOLS = List.of('+', '-', '/', '*', '(', ')', '\0');
 
     @Override
     public TripleExpression parse(String expression) {
         setSource(new StringSource(expression));
         skipWhitespace();
-        TripleExpression result = parse(MAX_LEVEL, false);
-        if (ch != '\0' || !lastOperation.equals(""))
+        TripleExpression result = parse(MAX_LEVEL);
+        if (ch != '\0') {
             throw new ExtraSymbolsException("Unexpected symbols at the end");
+        }
         return result;
     }
 
-    private CommonExpression parse(int level, boolean brackets) {
-        skipWhitespace();
+    private CommonExpression parse(int level) {
         if (level == MIN_LEVEL) {
             return getMinLevelExpression();
         }
-        CommonExpression current = parse(level - 1, false);
-        while (PRIORITIES.getOrDefault(lastOperation, MIN_LEVEL) == level) {
-            current = getExpression(lastOperation, current, parse(level - 1, false));
-        }
         skipWhitespace();
-        if (brackets) {
-            if (!lastOperation.equals(")")){
-                throw new AssertException("Expected closing brackets");
+        CommonExpression current = parse(level - 1);
+        while (true) {
+            boolean flag = false;
+            skipWhitespace();
+            for (String operation : PRIORITIES.get(level)) {
+                if (test(operation)) {
+                    expect(operation);
+                    current = getExpression(operation, current, parse(level - 1));
+                    flag = true;
+                }
             }
-            getOperation();
+            if (!flag) {
+                break;
+            }
         }
         return current;
     }
 
     private CommonExpression getMinLevelExpression() {
+        skipWhitespace();
         if (test('-')) {
-            skipWhitespace();
             if (isDigit()) {
                 return getConst(true);
             } else {
@@ -65,7 +62,17 @@ public class ExpressionParser extends BaseParser implements Parser {
         } else if (isDigit()) {
             return getConst(false);
         } else if (test('(')) {
-            return parse(MAX_LEVEL, true);
+            CommonExpression result = parse(MAX_LEVEL);
+            expect(')');
+            return result;
+        } else if (test('l')) {
+            expect("og2");
+            expectSpace();
+            return new CheckedLog2(getMinLevelExpression());
+        } else if (test('p')) {
+            expect("ow2");
+            expectSpace();
+            return new CheckedPow2(getMinLevelExpression());
         } else {
             return getVariable();
         }
@@ -80,7 +87,6 @@ public class ExpressionParser extends BaseParser implements Parser {
             nextChar();
         }
         skipWhitespace();
-        getOperation();
         try {
             return new Const(Integer.parseInt(builder.toString()));
         } catch (NumberFormatException e) {
@@ -91,7 +97,7 @@ public class ExpressionParser extends BaseParser implements Parser {
     private Variable getVariable() {
         StringBuilder builder = new StringBuilder();
         skipWhitespace();
-        while (!getOperation() && ch != '\0') {
+        while (!SPECIAL_SYMBOLS.contains(ch)) {
             builder.append(ch);
             nextChar();
             skipWhitespace();
@@ -113,21 +119,12 @@ public class ExpressionParser extends BaseParser implements Parser {
                 return new CheckedMultiply(left, right);
             case "/":
                 return new CheckedDivide(left, right);
+            case "**":
+                return new CheckedPow(left, right);
+            case "//":
+                return new CheckedLog(left, right);
             default:
                 throw new InvalidOperationException("Unsupported operation");
         }
-    }
-
-    private boolean getOperation() {
-        if (ch == '\0'){
-            lastOperation = "";
-        }
-        if (!GET_BY_FIRST_CHAR.containsKey(ch)) {
-            return false;
-        }
-        String operation = GET_BY_FIRST_CHAR.get(ch);
-        expect(operation);
-        lastOperation = operation;
-        return true;
     }
 }

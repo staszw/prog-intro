@@ -19,7 +19,17 @@ public class StringSource implements ExpressionSource {
     }
 
     @Override
+    public boolean hasNext(int delta) {
+        return pos + delta - 1 < data.length();
+    }
+
+    @Override
     public char next() {
         return data.charAt(pos++);
+    }
+
+    @Override
+    public char next(int delta) {
+        return data.charAt(pos + delta - 1);
     }
 }
