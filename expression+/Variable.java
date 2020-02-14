@@ -6,9 +6,6 @@ public final class Variable extends CommonExpression {
     private final String name;
 
     public Variable(String name) {
-        if (!name.equals("x") && !name.equals("y") && !name.equals("z")) {
-            throw new IllegalStateException("Variable with illegal name");
-        }
         this.name = name;
     }
 

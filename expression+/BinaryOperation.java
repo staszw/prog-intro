@@ -19,13 +19,10 @@ public abstract class BinaryOperation extends CommonExpression {
 
     public abstract boolean needsExtraBrackets();
 
-    public abstract void checkException(int x, int y);
-
     @Override
     public int evaluate(int x, int y, int z) {
         int leftValue = left.evaluate(x, y, z);
         int rightValue = right.evaluate(x, y, z);
-        checkException(leftValue, rightValue);
         return calculate(leftValue, rightValue);
     }
 
@@ -33,7 +30,6 @@ public abstract class BinaryOperation extends CommonExpression {
     public int evaluate(int x) {
         int leftValue = left.evaluate(x);
         int rightValue = right.evaluate(x);
-        checkException(leftValue, rightValue);
         return calculate(leftValue, rightValue);
     }
 

@@ -1,22 +1,23 @@
 package expression.exceptions;
 
 import expression.CommonExpression;
-import expression.Const;
 import expression.UnaryOperation;
 
-public class CheckedPow2 extends UnaryOperation {
+public final class CheckedPow2 extends UnaryOperation {
     public CheckedPow2(CommonExpression inner) {
-        super(new CheckedPow(new Const(2), inner));
+        super(inner);
     }
 
     @Override
     public int calculate(int x) {
-        return x;
-    }
+        if (x < 0) {
+            throw new OutsideTheDefinitionException("pow2");
+        }
+        if (x >= 31) {
+            throw new OverflowException();
+        }
 
-    @Override
-    public void checkException(int x) {
-        return;
+        return (1 << x);
     }
 
     @Override

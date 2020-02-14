@@ -9,21 +9,17 @@ public abstract class UnaryOperation extends CommonExpression {
 
     public abstract int calculate(int x);
 
-    public abstract void checkException(int x);
-
     public abstract String getSymbol();
 
     @Override
     public int evaluate(int x) {
         int innerValue = inner.evaluate(x);
-        checkException(innerValue);
         return calculate(innerValue);
     }
 
     @Override
     public int evaluate(int x, int y, int z) {
         int innerValue = inner.evaluate(x, y, z);
-        checkException(innerValue);
         return calculate(innerValue);
     }
 

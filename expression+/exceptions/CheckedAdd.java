@@ -20,18 +20,12 @@ public final class CheckedAdd extends BinaryOperation {
 
     @Override
     public int calculate(int x, int y) {
+        OverflowException.checkAdd(x, y);
         return x + y;
     }
 
     @Override
     public boolean needsExtraBrackets() {
         return false;
-    }
-
-    @Override
-    public void checkException(int x, int y) {
-        if (y > 0 && Integer.MAX_VALUE - y < x || y < 0 && Integer.MIN_VALUE - y > x) {
-            throw new OverflowException("Add", x + "+" + y);
-        }
     }
 }

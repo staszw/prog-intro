@@ -1,6 +1,6 @@
 package expression.parser;
 
-import expression.exceptions.AssertException;
+import expression.exceptions.NotFoundException;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
@@ -32,20 +32,15 @@ public class BaseParser {
                 return false;
             }
         }
+        expect(expected);
         return true;
     }
 
     protected void expect(final char c) {
         if (ch != c) {
-            throw new AssertException("Expected '" + c + "', found '" + ch + "'");
+            throw new NotFoundException("'" + c + "', found '" + ch + "'", getPosition());
         }
         nextChar();
-    }
-
-    protected void expectSpace() {
-        if (!Character.isWhitespace(ch) && ch != '-' && ch != '(') {
-            throw new AssertException("Expected space after function");
-        }
     }
 
     protected void expect(final String value) {
@@ -66,5 +61,9 @@ public class BaseParser {
         while (Character.isWhitespace(ch)) {
             nextChar();
         }
+    }
+
+    protected int getPosition() {
+        return source.getPosition();
     }
 }

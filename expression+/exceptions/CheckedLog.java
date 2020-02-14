@@ -3,7 +3,7 @@ package expression.exceptions;
 import expression.BinaryOperation;
 import expression.CommonExpression;
 
-public class CheckedLog extends BinaryOperation {
+public final class CheckedLog extends BinaryOperation {
     public CheckedLog(CommonExpression left, CommonExpression right) {
         super(left, right);
     }
@@ -20,10 +20,12 @@ public class CheckedLog extends BinaryOperation {
 
     @Override
     public int calculate(int x, int y) {
+        if (y <= 0 || y == 1 || x <= 0)
+            throw new OutsideTheDefinitionException("log");
         int result = 0;
         while (x >= y) {
             result++;
-            x = x / y;
+            x /= y;
         }
         return result;
     }
@@ -31,11 +33,5 @@ public class CheckedLog extends BinaryOperation {
     @Override
     public boolean needsExtraBrackets() {
         return false;
-    }
-
-    @Override
-    public void checkException(int x, int y) {
-        if (y <= 0 || y == 1 || x <= 0)
-            throw new InvalidArgumentException("Invalid arguments of log", x + "//" + y);
     }
 }

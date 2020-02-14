@@ -11,14 +11,8 @@ public final class CheckedNegate extends UnaryOperation {
 
     @Override
     public int calculate(int x) {
+        OverflowException.checkSubtract(0, x);
         return -x;
-    }
-
-    @Override
-    public void checkException(int x) {
-        if (x == Integer.MIN_VALUE) {
-            throw new OverflowException("Negate", "-" + x);
-        }
     }
 
     @Override

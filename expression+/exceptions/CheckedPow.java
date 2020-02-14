@@ -3,7 +3,7 @@ package expression.exceptions;
 import expression.BinaryOperation;
 import expression.CommonExpression;
 
-public class CheckedPow extends BinaryOperation {
+public final class CheckedPow extends BinaryOperation {
     public CheckedPow(CommonExpression left, CommonExpression right) {
         super(left, right);
     }
@@ -20,34 +20,31 @@ public class CheckedPow extends BinaryOperation {
 
     @Override
     public int calculate(int x, int y) {
-        if (y < 0)
+        if (x == 0 && y == 0 || y < 0) {
+            throw new OutsideTheDefinitionException("pow");
+        }
+        if (x == 0) {
             return 0;
-        if (y == 0)
-            return 1;
+        }
+
         int result = 1;
-        for (int i = 0; i < y; i++)
-            result *= x;
+        int currentX = x, currentY = y;
+        while (currentY != 0) {
+            if (currentY % 2 == 1) {
+                OverflowException.checkMultiply(result, currentX);
+                result = result * currentX;
+                currentY--;
+            } else {
+                OverflowException.checkMultiply(currentX, currentX);
+                currentX *= currentX;
+                currentY /= 2;
+            }
+        }
         return result;
     }
 
     @Override
     public boolean needsExtraBrackets() {
         return false;
-    }
-
-    @Override
-    public void checkException(int x, int y) {
-        if (x == 0 && y == 0 || y < 0) {
-            throw new InvalidArgumentException("Not defined pow", Integer.toString(x));
-        }
-        if (x >= -1 && x <= 1)
-            return;
-        int result = 1;
-        for (int i = 0; i < y; i++) {
-            int nw = result * x;
-            if (nw / result != x || nw / x != result)
-                throw new OverflowException("Pow", x + "**" + y);
-            result = nw;
-        }
     }
 }

@@ -2,7 +2,6 @@ package expression.exceptions;
 
 import expression.BinaryOperation;
 import expression.CommonExpression;
-import expression.exceptions.OverflowException;
 
 public final class CheckedSubtract extends BinaryOperation {
     public CheckedSubtract(CommonExpression left, CommonExpression right) {
@@ -21,18 +20,12 @@ public final class CheckedSubtract extends BinaryOperation {
 
     @Override
     public int calculate(int x, int y) {
+        OverflowException.checkSubtract(x, y);
         return x - y;
     }
 
     @Override
     public boolean needsExtraBrackets() {
         return true;
-    }
-
-    @Override
-    public void checkException(int x, int y) {
-        if (y > 0 && Integer.MIN_VALUE + y > x || y < 0 && Integer.MAX_VALUE + y < x) {
-            throw new OverflowException("Subtract", x + "-" + y);
-        }
     }
 }

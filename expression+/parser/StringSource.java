@@ -1,7 +1,5 @@
 package expression.parser;
 
-import expression.exceptions.IllegalConstException;
-
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
@@ -31,5 +29,10 @@ public class StringSource implements ExpressionSource {
     @Override
     public char next(int delta) {
         return data.charAt(pos + delta - 1);
+    }
+
+    @Override
+    public int getPosition() {
+        return pos;
     }
 }

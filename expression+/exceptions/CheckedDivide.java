@@ -20,21 +20,15 @@ public final class CheckedDivide extends BinaryOperation {
 
     @Override
     public int calculate(int x, int y) {
+        OverflowException.checkDivide(x, y);
+        if (y == 0) {
+            throw new DivideByZeroException();
+        }
         return x / y;
     }
 
     @Override
     public boolean needsExtraBrackets() {
         return true;
-    }
-
-    @Override
-    public void checkException(int x, int y) {
-        if (x == Integer.MIN_VALUE && y == -1) {
-            throw new OverflowException("Divide", x + "/" + y);
-        }
-        if (y == 0) {
-            throw new DivideByZeroException(x + "/" + y);
-        }
     }
 }
